@@ -12,10 +12,11 @@ public:
     unsigned char suit() const { return V / 9; }
     unsigned char value() const { return V % 9; }
     friend std::ostream& operator<<(std::ostream& os, const Card& C) {
-        os << values[C.value()];
+        os << values[C.value()] << suits[C.suit()];
         return os;
     }
 private:
     const unsigned char V;
     static const char* values[];
+    static const char* suits[];
 };

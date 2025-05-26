@@ -5,5 +5,5 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(deck deck.cpp)
-target_link_libraries(deck)
 add_executable(test test.cpp)
+target_link_libraries(test deck)
