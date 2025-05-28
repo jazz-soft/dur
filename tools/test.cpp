@@ -5,6 +5,12 @@ using namespace std;
 
 int main()
 {
-    Card C(Card::SQ);
-    cout << C << endl;
+    Deck D;
+    cout << D << endl;
+    D.shuffle();
+    cout << D << endl;
+    D.shuffle();
+    cout << D << endl;
+    D.shuffle();
+    cout << D << endl;
 }

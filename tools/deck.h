@@ -1,4 +1,6 @@
 #include <iostream>
+#include <array>
+#include <algorithm>
 
 class Card {
 public:
@@ -19,4 +21,22 @@ private:
     const unsigned char V;
     static const char* values[];
     static const char* suits[];
+};
+
+class Deck {
+    static const unsigned char SZ = 36;
+public:
+    Deck() { for (auto i = 0; i < SZ; i++) A[i] = i; }
+    auto size() const { return SZ;  }
+    template<typename T> unsigned char operator[](T i) const { return A[i]; }
+    void shuffle() { std::random_shuffle(A.begin(), A.end()); }
+    friend std::ostream& operator<<(std::ostream& os, const Deck& D) {
+        for (auto i = 0; i < D.size(); i++) {
+            if (i) os << " ";
+            os << Card(D[i]);
+        }
+        return os;
+    }
+private:
+    std::array<unsigned char, SZ> A;
 };
