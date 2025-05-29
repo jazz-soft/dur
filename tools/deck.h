@@ -40,3 +40,38 @@ public:
 private:
     std::array<unsigned char, SZ> A;
 };
+
+class Hand {
+    static const unsigned char SZ = 36;
+public:
+    Hand() : H(0) {}
+    template<typename T> Hand& operator+(T x) {
+        int64_t t = 1;
+        t <<= x;
+        H |= t;
+        return *this;
+    }
+    template<typename T> Hand& operator-(T x) {
+        int64_t t = 1;
+        t <<= x;
+        H &= ~t;
+        return *this;
+    }
+    template<typename T> Hand& operator+=(T x) { return *this + x; }
+    template<typename T> Hand& operator-=(T x) { return *this - x; }
+    friend std::ostream& operator<<(std::ostream& os, const Hand& H) {
+        bool first = true;
+        int64_t t = 1;
+        for (auto i = 0; i < SZ; i++) {
+            if (H.H & t) {
+                if (!first) os << " ";
+                os << Card(i);
+                first = false;
+            }
+            t <<= 1;
+        }
+        return os;
+    }
+private:
+    int64_t H;
+};
