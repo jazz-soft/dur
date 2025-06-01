@@ -12,7 +12,6 @@ function card(n) {
     else if (n == 37) x = 11;
     var span = document.createElement('span');
     span.style.display = 'inline-block';
-    span.style.backgroundColor = 'red';
     span.style.width = WIDTH + 'px';
     span.style.height = HEIGHT + 'px';
     span.style.backgroundImage = 'url("cards.png")';
@@ -32,7 +31,6 @@ function cardh(n) {
     else if (n == 37) y = 11;
     var span = document.createElement('span');
     span.style.display = 'inline-block';
-    span.style.backgroundColor = 'red';
     span.style.width = HEIGHT + 'px';
     span.style.height = WIDTH + 'px';
     span.style.backgroundImage = 'url("cardsh.png")';
@@ -40,6 +38,9 @@ function cardh(n) {
     span.style.backgroundPositionY = (-y * WIDTH) + 'px';
     return span;
 }
+
+function suit(n) { return Math.floor(n / 9); }
+function value(n) { return n % 9; }
 
 function backv(n) {
     n = n || 0;
@@ -51,7 +52,6 @@ function backv(n) {
     }
     var span = document.createElement('span');
     span.style.display = 'inline-block';
-    span.style.backgroundColor = 'red';
     span.style.width = WIDTH + 'px';
     span.style.height = HEIGHT + 'px';
     span.style.backgroundImage = 'url("cards.png")';
@@ -70,7 +70,6 @@ function backh(n) {
     }
     var span = document.createElement('span');
     span.style.display = 'inline-block';
-    span.style.backgroundColor = 'red';
     span.style.width = HEIGHT + 'px';
     span.style.height = WIDTH + 'px';
     span.style.backgroundImage = 'url("cardsh.png")';
@@ -79,17 +78,57 @@ function backh(n) {
     return span;
 }
 
-function Deck() { this.A = [...Array(36).keys()]; }
+function Deck(D) { this.A = D ? D.A.slice() : [...Array(36).keys()]; }
 Deck.prototype.shuffle = function() {
     var n = this.A.length;
     var k, x;
     while (n) {
         k = Math.floor(Math.random() * n);
         n--;
-        x = this.A[k]; 
+        x = this.A[k];
         this.A[k] = this.A[n];
         this.A[n] = x;
     }
-
 }
 Deck.prototype.card = function(n) { return this.A[n]; }
+
+function State(opt) {
+    var i, n, k;
+    opt = opt || {};
+    this.deck = new Deck(opt.deck);
+    if (!opt.deck) this.deck.shuffle();
+    this.trump = suit(this.deck.card(35));
+    n = opt.players;
+    if (!n || n != parseInt(n) || n < 2 || n > 6) {
+        this.pairs = true;
+        n = 4;
+    }
+    this.players = n;
+    this.hands = [];
+    k = 0;
+    for (i = 0; i < this.players; i++) {
+        this.hands[i] = this.deck.A.slice(k, k + 6);
+        this.hands[i].sort(compare);
+        k += 6;
+    }
+    n = opt.turn;
+    if (n != parseInt(n) || n < 0 || n >= this.players) n = first(this);
+    this.turn = n;
+    this.round = n;
+}
+
+function first(X) {
+    var i, j, k, n = 0, m = 99;
+    for (i = 0; i < X.players; i++) {
+        for (j = 0; j < 6; j++) {
+            k = X.hands[i][j];
+            if (suit(k) != X.trump || k > m) continue;
+            m = k;
+            n = i;
+            break;
+        }
+    }
+    return n;
+}
+
+function compare(a, b) { return a - b; }
