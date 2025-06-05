@@ -13,6 +13,7 @@ public:
     Card(unsigned char v) : V(v) {};
     unsigned char suit() const { return V / 9; }
     unsigned char value() const { return V % 9; }
+    template<typename T> operator T() const { return V; }
     friend std::ostream& operator<<(std::ostream& os, const Card& C) {
         os << values[C.value()] << suits[C.suit()];
         return os;
