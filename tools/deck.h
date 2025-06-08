@@ -1,6 +1,5 @@
 #include <iostream>
 #include <array>
-#include <algorithm>
 
 class Card {
 public:
@@ -12,15 +11,15 @@ public:
     };
     Card(unsigned char v) : V(v) {};
     unsigned char suit() const { return V / 9; }
-    unsigned char value() const { return V % 9; }
+    unsigned char rank() const { return V % 9; }
     template<typename T> operator T() const { return V; }
     friend std::ostream& operator<<(std::ostream& os, const Card& C) {
-        os << values[C.value()] << suits[C.suit()];
+        os << ranks[C.rank()] << suits[C.suit()];
         return os;
     }
 private:
     const unsigned char V;
-    static const char* values[];
+    static const char* ranks[];
     static const char* suits[];
 };
 
@@ -30,7 +29,7 @@ public:
     Deck() { for (auto i = 0; i < SZ; i++) A[i] = i; }
     auto size() const { return SZ;  }
     template<typename T> unsigned char operator[](T i) const { return A[i]; }
-    void shuffle() { std::random_shuffle(A.begin(), A.end()); }
+    void shuffle();
     friend std::ostream& operator<<(std::ostream& os, const Deck& D) {
         for (auto i = 0; i < D.size(); i++) {
             if (i) os << " ";

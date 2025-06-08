@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     vector<unsigned char> H1, H2;
     int n1 = -1, n2 = -1, tr = -1;
     int n;
+    random_device rd;
     if (argc == 3) {
         n1 = num(argv[1]);
         n2 = num(argv[2]);
@@ -52,6 +53,7 @@ int main(int argc, char* argv[]) {
         D.shuffle();
         for (n = 0; n < n1; n++) M1[D[n]] = true;
         for (n = n1; n < n1 + n2; n++) M2[D[n]] = true;
+        tr = rd() & 3;
     }
     else {
         string dash = "-";
