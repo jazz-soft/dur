@@ -111,10 +111,12 @@ function State(opt) {
         this.hands[i].sort(compare);
         k += 6;
     }
+    this.left = 36 - k;
     n = opt.turn;
     if (n != parseInt(n) || n < 0 || n >= this.players) n = first(this);
     this.turn = n;
     this.round = n;
+    this.gui = [];
 }
 
 function first(X) {
@@ -132,3 +134,64 @@ function first(X) {
 }
 
 function compare(a, b) { return a - b; }
+
+function Gui(at) {
+    var div = document.createElement('div');
+    this.div = div;
+    div.style.display = 'inline-block';
+    div.style.width = '100%';
+    //div.style.backgroundColor = 'red';
+    div.style.position = 'relative';
+    div.innerHTML = '*';
+    document.body.appendChild(div);
+}
+Gui.prototype.init = function(G) {
+    this.div.innerHTML = '';
+    this.deck = new GuiDeck(this.div);
+    this.set(G);
+}
+Gui.prototype.set = function(G) {
+    this.deck.set(G.left, G.deck.A[35]);
+}
+
+function GuiDeck(at) {
+    var span = document.createElement('span');
+    this.span = span;
+    span.style.display = 'inline-block';
+    //span.style.backgroundColor = 'yellow';
+    span.style.position = 'relative';
+    span.style.width = '126px';
+    span.style.height = '96px';
+    at.appendChild(span);
+}
+GuiDeck.prototype.set = function(n, c) {
+    if (!this.bottom) {
+        this.bottom = cardh(c);
+        this.bottom.style.position = 'absolute';
+        this.bottom.style.top = '13px';
+        this.bottom.style.left = '30px';
+        this.span.appendChild(this.bottom);
+    }
+    if (!this.back) {
+        this.back = backv(0);
+        this.back.style.position = 'absolute';
+        this.back.style.top = '0';
+        this.back.style.left = '0';
+        this.span.appendChild(this.back);
+    }
+    if (!this.trump) {
+        this.trump = document.createElement('span');
+        this.trump.style.display = 'inline-block';
+        this.trump.style.position = 'absolute';
+        this.trump.style.top = '0';
+        this.trump.style.left = '0';
+        this.trump.style.width = '126px';
+        this.trump.style.height = '96px';
+        this.trump.style.textAlign = 'center';
+        this.trump.style.lineHeight = '96px';
+        this.trump.style.fontSize = '48px';
+        this.trump.style.color = '#fa8';
+        this.trump.innerHTML = '\u2660';
+        //this.span.appendChild(this.trump);
+    }
+}
