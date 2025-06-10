@@ -136,62 +136,82 @@ function first(X) {
 function compare(a, b) { return a - b; }
 
 function Gui(at) {
-    var div = document.createElement('div');
-    this.div = div;
-    div.style.display = 'inline-block';
-    div.style.width = '100%';
-    //div.style.backgroundColor = 'red';
-    div.style.position = 'relative';
-    div.innerHTML = '*';
-    document.body.appendChild(div);
+    this.div = document.createElement('div');
+    this.div.style.display = 'inline-block';
+    this.div.style.width = '100%';
+    this.div.style.position = 'relative';
+    document.body.appendChild(this.div);
 }
 Gui.prototype.init = function(G) {
     this.div.innerHTML = '';
-    this.deck = new GuiDeck(this.div);
+    this.top = document.createElement('div');
+    this.top.style.textAlign = 'center';
+    this.div.appendChild(this.top);
+    this.middle = document.createElement('div');
+    //this.middle.style.textAlign = 'center';
+    this.div.appendChild(this.middle);
+    this.bottom = document.createElement('div');
+    this.bottom.style.textAlign = 'center';
+    this.div.appendChild(this.bottom);
+    this.deck = new GuiDeck(this.middle);
+    this.hand = new GuiHand(this.bottom);
     this.set(G);
 }
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
+    this.hand.set(G);
 }
 
 function GuiDeck(at) {
-    var span = document.createElement('span');
-    this.span = span;
-    span.style.display = 'inline-block';
-    //span.style.backgroundColor = 'yellow';
-    span.style.position = 'relative';
-    span.style.width = '126px';
-    span.style.height = '96px';
-    at.appendChild(span);
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    this.span.style.position = 'relative';
+    this.span.style.width = '126px';
+    this.span.style.height = '96px';
+    at.appendChild(this.span);
 }
 GuiDeck.prototype.set = function(n, c) {
-    if (!this.bottom) {
+    if (!this.gui) {
+        this.gui = true;
+        var tr = suit(c);
+        var span = card(-1);
+        span.style.position = 'absolute';
+        span.style.top = '0';
+        span.style.left = '0';
+        this.span.appendChild(span);
+        var span = cardh(-1);
+        span.style.position = 'absolute';
+        span.style.top = '13px';
+        span.style.left = '30px';
+        span.style.textAlign = 'center';
+        span.style.lineHeight = '71px';
+        span.style.fontSize = '48px';
+        span.style.color = tr % 3 ? '#fa8' : '#fff';
+        span.innerHTML = '\u2660\u2665\u2666\u2663'[tr];
+        this.span.appendChild(span);
         this.bottom = cardh(c);
         this.bottom.style.position = 'absolute';
         this.bottom.style.top = '13px';
         this.bottom.style.left = '30px';
         this.span.appendChild(this.bottom);
-    }
-    if (!this.back) {
         this.back = backv(0);
         this.back.style.position = 'absolute';
         this.back.style.top = '0';
         this.back.style.left = '0';
         this.span.appendChild(this.back);
     }
-    if (!this.trump) {
-        this.trump = document.createElement('span');
-        this.trump.style.display = 'inline-block';
-        this.trump.style.position = 'absolute';
-        this.trump.style.top = '0';
-        this.trump.style.left = '0';
-        this.trump.style.width = '126px';
-        this.trump.style.height = '96px';
-        this.trump.style.textAlign = 'center';
-        this.trump.style.lineHeight = '96px';
-        this.trump.style.fontSize = '48px';
-        this.trump.style.color = '#fa8';
-        this.trump.innerHTML = '\u2660';
-        //this.span.appendChild(this.trump);
+}
+
+function GuiHand(at) {
+    var span = document.createElement('span');
+    this.span = span;
+    span.style.display = 'inline-block';
+    //span.style.backgroundColor = 'yellow';
+    span.style.position = 'relative';
+    at.appendChild(span);
+}
+GuiHand.prototype.set = function(G) {
+    for (var i = 0; i < G.hands[0].length; i++) {
+        this.span.appendChild(card(G.hands[0][i]));
     }
 }
