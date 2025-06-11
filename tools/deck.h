@@ -1,3 +1,6 @@
+#ifndef _DECK_H_
+#define _DECK_H_
+
 #include <iostream>
 #include <array>
 
@@ -45,6 +48,8 @@ class Hand {
     static const unsigned char SZ = 36;
 public:
     Hand() : H(0) {}
+    Hand(int64_t h) : H(h) {}
+    Hand(const Hand& h) : H(h.H) {}
     template<typename T> Hand& operator+(T x) {
         int64_t t = 1;
         t <<= x;
@@ -75,3 +80,5 @@ public:
 private:
     int64_t H;
 };
+
+#endif // _DECK_H_

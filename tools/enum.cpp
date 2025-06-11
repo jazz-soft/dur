@@ -4,7 +4,7 @@
 #include <map>
 #include <random>
 #include "deck.h"
-#include "enum.h"
+#include "state.h"
 
 using namespace std;
 
@@ -81,4 +81,6 @@ int main(int argc, char* argv[]) {
     cout << "; 2:";
     for (auto x : H2) cout << " " << Card(x);
     cout << "; Trump: " << Suit[tr] << endl;
+    State X;
+    cout << X << endl;
 }
