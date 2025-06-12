@@ -146,20 +146,48 @@ Gui.prototype.init = function(G) {
     this.div.innerHTML = '';
     this.top = document.createElement('div');
     this.top.style.textAlign = 'center';
+    this.top.style.height = '120px';
     this.div.appendChild(this.top);
     this.middle = document.createElement('div');
-    //this.middle.style.textAlign = 'center';
+
+    this.div.appendChild(this.middle);
+    this.left = document.createElement('div');
+    this.left.style.display = 'inline-block';
+    this.left.style.width = '200px';
+    this.left.style.textAlign = 'center';
+    this.middle.appendChild(this.left);
+
+    this.right = document.createElement('div');
+    this.right.style.display = 'inline-block';
+    this.right.style.width = '200px';
+    this.right.style.float = 'right';
+    this.right.style.textAlign = 'center';
+    this.middle.appendChild(this.right);
+
+    this.center = document.createElement('div');
+    this.center.style.display = 'inline-block';
+    this.center.style.textAlign = 'center';
+    this.middle.appendChild(this.center);
+
     this.div.appendChild(this.middle);
     this.bottom = document.createElement('div');
     this.bottom.style.textAlign = 'center';
+    this.bottom.style.height = '120px';
+    //this.bottom.style.backgroundColor = 'yellow';
     this.div.appendChild(this.bottom);
-    this.deck = new GuiDeck(this.middle);
-    this.hand = new GuiHand(this.bottom);
+    this.deck = new GuiDeck(this.center);
+    this.hands = [];
+    this.hands.push(new GuiHand(this.bottom));
+    this.hands.push(new GuiBack(2, this.top));
+    this.hands.push(new GuiBackL(1, this.left));
+    this.hands.push(new GuiBackR(3, this.right));
+
     this.set(G);
 }
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
-    this.hand.set(G);
+   // this.hand.set(G);
+    for (var h of this.hands) h.set(G);
 }
 
 function GuiDeck(at) {
@@ -213,5 +241,47 @@ function GuiHand(at) {
 GuiHand.prototype.set = function(G) {
     for (var i = 0; i < G.hands[0].length; i++) {
         this.span.appendChild(card(G.hands[0][i]));
+    }
+}
+
+function GuiBack(n, at) {
+    this.n = n;
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    //this.span.style.backgroundColor = 'red';
+    this.span.style.position = 'relative';
+    at.appendChild(this.span);
+}
+GuiBack.prototype.set = function(G) {
+    for (var i = 0; i < G.hands[this.n].length; i++) {
+        this.span.appendChild(backv());
+    }
+}
+
+function GuiBackL(n, at) {
+    this.n = n;
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    this.span.style.width = '96px';
+    this.span.style.position = 'relative';
+    at.appendChild(this.span);
+}
+GuiBackL.prototype.set = function(G) {
+    for (var i = 0; i < G.hands[this.n].length; i++) {
+        this.span.appendChild(backh());
+    }
+}
+
+function GuiBackR(n, at) {
+    this.n = n;
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    this.span.style.width = '96px';
+    this.span.style.position = 'relative';
+    at.appendChild(this.span);
+}
+GuiBackR.prototype.set = function(G) {
+    for (var i = 0; i < G.hands[this.n].length; i++) {
+        this.span.appendChild(backh());
     }
 }
