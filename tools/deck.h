@@ -7,10 +7,10 @@
 class Card {
 public:
     enum {
-        S6, S7, S8, S9, S10, SJ, SQ, SK, SA,
-        H6, H7, H8, H9, H10, HJ, HQ, HK, HA,
+        C6, C7, C8, C9, C10, CJ, CQ, CK, CA,
         D6, D7, D8, D9, D10, DJ, DQ, DK, DA,
-        C6, C7, C8, C9, C10, CJ, CQ, CK, CA
+        S6, S7, S8, S9, S10, SJ, SQ, SK, SA,
+        H6, H7, H8, H9, H10, HJ, HQ, HK, HA
     };
     Card(unsigned char v) : V(v) {};
     unsigned char suit() const { return V / 9; }
@@ -20,10 +20,10 @@ public:
         os << ranks[C.rank()] << suits[C.suit()];
         return os;
     }
-private:
-    const unsigned char V;
     static const char* ranks[];
     static const char* suits[];
+private:
+    const unsigned char V;
 };
 
 class Deck {
@@ -50,16 +50,13 @@ public:
     Hand() : H(0) {}
     Hand(int64_t h) : H(h) {}
     Hand(const Hand& h) : H(h.H) {}
+    template<typename T> Hand(T a) : H(0) { for (auto x : a) H |= (int64_t(1) << x); }
     template<typename T> Hand& operator+(T x) {
-        int64_t t = 1;
-        t <<= x;
-        H |= t;
+        H |= int64_t(1) << x;
         return *this;
     }
     template<typename T> Hand& operator-(T x) {
-        int64_t t = 1;
-        t <<= x;
-        H &= ~t;
+        H &= ~(int64_t(1) << x);
         return *this;
     }
     template<typename T> Hand& operator+=(T x) { return *this + x; }

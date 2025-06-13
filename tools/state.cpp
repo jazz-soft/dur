@@ -3,6 +3,6 @@
 using namespace std;
 
 std::ostream& operator<<(std::ostream& os, const State& X) {
-    //os << ranks[C.rank()] << suits[C.suit()];
+    os << "1: " << X.A << ", 2: " << X.B << ", tr: " << Card::suits[X.Tr];
     return os;
 }
