@@ -6,7 +6,7 @@ function card(n) {
     var y = 4;
     if (n >= 0 && n < 36) {
         x = [5, 6, 7, 8, 9, 10, 11, 12, 0][n % 9];
-        y = [0, 1, 3, 2][Math.floor(n / 9)];
+        y = [2, 3, 0, 1][Math.floor(n / 9)];
     }
     else if (n == 36) x = 10;
     else if (n == 37) x = 11;
@@ -24,7 +24,7 @@ function cardh(n) {
     var x = 1;
     var y = 12;
     if (n >= 0 && n < 36) {
-        x = [5, 4, 2, 3][Math.floor(n / 9)];
+        x = [3, 2, 5, 4][Math.floor(n / 9)];
         y = [5, 6, 7, 8, 9, 10, 11, 12, 0][n % 9];
     }
     else if (n == 36) y = 10;
@@ -148,12 +148,15 @@ Gui.prototype.init = function(G) {
     this.top.style.textAlign = 'center';
     this.top.style.height = '120px';
     this.div.appendChild(this.top);
+
     this.middle = document.createElement('div');
+    this.middle.style.textAlign = 'center';
 
     this.div.appendChild(this.middle);
     this.left = document.createElement('div');
     this.left.style.display = 'inline-block';
     this.left.style.width = '200px';
+    this.left.style.float = 'left';
     this.left.style.textAlign = 'center';
     this.middle.appendChild(this.left);
 
@@ -166,16 +169,25 @@ Gui.prototype.init = function(G) {
 
     this.center = document.createElement('div');
     this.center.style.display = 'inline-block';
-    this.center.style.textAlign = 'center';
+    this.center.style.textAlign = 'left';
+    this.center.style.width = '800px';
     this.middle.appendChild(this.center);
+
+    this.centerup = document.createElement('div');
+    this.center.appendChild(this.centerup);
+
+    this.centerdown = document.createElement('div');
+    this.centerdown.style.textAlign = 'center';
+    this.center.appendChild(this.centerdown);
 
     this.div.appendChild(this.middle);
     this.bottom = document.createElement('div');
     this.bottom.style.textAlign = 'center';
     this.bottom.style.height = '120px';
-    //this.bottom.style.backgroundColor = 'yellow';
+
     this.div.appendChild(this.bottom);
-    this.deck = new GuiDeck(this.center);
+    this.deck = new GuiDeck(this.centerup);
+    this.table = new GuiTable(this.centerdown);
     this.hands = [];
     this.hands.push(new GuiHand(this.bottom));
     this.hands.push(new GuiBack(2, this.top));
@@ -186,7 +198,6 @@ Gui.prototype.init = function(G) {
 }
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
-   // this.hand.set(G);
     for (var h of this.hands) h.set(G);
 }
 
@@ -230,11 +241,23 @@ GuiDeck.prototype.set = function(n, c) {
     }
 }
 
+
+function GuiTable(at) {
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    this.span.style.position = 'relative';
+    this.span.style.width = '600px';
+    this.span.style.height = '300px';
+    //this.span.style.backgroundColor = 'yellow';
+    at.appendChild(this.span);
+}
+GuiTable.prototype.set = function(G) {
+}
+
 function GuiHand(at) {
     var span = document.createElement('span');
     this.span = span;
     span.style.display = 'inline-block';
-    //span.style.backgroundColor = 'yellow';
     span.style.position = 'relative';
     at.appendChild(span);
 }
@@ -248,7 +271,6 @@ function GuiBack(n, at) {
     this.n = n;
     this.span = document.createElement('span');
     this.span.style.display = 'inline-block';
-    //this.span.style.backgroundColor = 'red';
     this.span.style.position = 'relative';
     at.appendChild(this.span);
 }
