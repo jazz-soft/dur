@@ -40,7 +40,8 @@ function cardh(n) {
 }
 
 function suit(n) { return Math.floor(n / 9); }
-function value(n) { return n % 9; }
+function rank(n) { return n % 9; }
+function name(n) { return [6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'][rank(n)] + '\u2663\u2666\u2660\u2665'[suit(n)]; }
 
 function backv(n) {
     n = n || 0;
@@ -115,7 +116,9 @@ function State(opt) {
     n = opt.turn;
     if (n != parseInt(n) || n < 0 || n >= this.players) n = first(this);
     this.turn = n;
-    this.round = n;
+    this.att = n;
+    this.def = (n + 1) % this.players;
+    this.table = [];
     this.gui = [];
 }
 
@@ -198,6 +201,7 @@ Gui.prototype.init = function(G) {
 }
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
+    this.table.set(G);
     for (var h of this.hands) h.set(G);
 }
 
@@ -226,7 +230,7 @@ GuiDeck.prototype.set = function(n, c) {
         span.style.lineHeight = '71px';
         span.style.fontSize = '48px';
         span.style.color = tr % 3 ? '#fa8' : '#fff';
-        span.innerHTML = '\u2660\u2665\u2666\u2663'[tr];
+        span.innerHTML = '\u2663\u2666\u2660\u2665'[tr];
         this.span.appendChild(span);
         this.bottom = cardh(c);
         this.bottom.style.position = 'absolute';
@@ -252,19 +256,62 @@ function GuiTable(at) {
     at.appendChild(this.span);
 }
 GuiTable.prototype.set = function(G) {
+    var i, c;
+    this.span.innerHTML = '';
+    for (i = 0; i < G.table.length; i++) {
+        c = card(G.table[i][0]);
+        c.style.position = 'absolute';
+        c.style.top = '100px';
+        c.style.left = (i * 120) + 'px';
+        this.span.appendChild(c);
+        if (G.table[i].length > 1) {
+            c = card(G.table[i][1]);
+            c.style.position = 'absolute';
+            c.style.top = '70px';
+            c.style.left = (30 + i * 120) + 'px';
+            this.span.appendChild(c);
+        }
+    }
 }
 
 function GuiHand(at) {
-    var span = document.createElement('span');
-    this.span = span;
-    span.style.display = 'inline-block';
-    span.style.position = 'relative';
-    at.appendChild(span);
+    this.span = document.createElement('span');
+    this.span.style.display = 'inline-block';
+    this.span.style.position = 'relative';
+    this.span.style.height = '150px';
+    at.appendChild(this.span);
 }
 GuiHand.prototype.set = function(G) {
-    for (var i = 0; i < G.hands[0].length; i++) {
-        this.span.appendChild(card(G.hands[0][i]));
+    var i, c, v;
+    var x = 0;
+    var y0 = '20px';
+    var y1 = '10px';
+    for (i = 0; i < G.hands[0].length; i++) {
+        v = G.hands[0][i];
+        c = card(v);
+        c.style.position = 'absolute';
+        c.style.top = '20px';
+        c.style.left = x + 'px';
+        if (valid(G, 0, v)) {
+            c.style.top = '10px';
+            events(c, G, 0, v);
+        }
+        this.span.appendChild(c);
+        x += 80;
     }
+    x += 20;
+    v = valid(G, 0, -1);
+    c = card(-1);
+    c.style.position = 'absolute';
+    c.style.top = '20px';
+    c.style.left = x + 'px';
+    if (valid(G, 0, -1)) {
+        c.style.top = '10px';
+        events(c, G, 0, -1);
+    }
+    this.span.appendChild(c);
+    x += WIDTH;
+    this.span.style.width = x + 'px';
 }
 
 function GuiBack(n, at) {
@@ -306,4 +353,35 @@ GuiBackR.prototype.set = function(G) {
     for (var i = 0; i < G.hands[this.n].length; i++) {
         this.span.appendChild(backh());
     }
+}
+
+function valid(G, h, c) {
+    var a, x;
+    console.log(h, c, G.att);
+    if (h == G.att) {
+        if (!G.table.length) return c != -1;
+        for (a of G.table) for (x of a) if (rank(x) == rank(c)) return true;
+        return c == -1;
+    }
+    if (h == G.def) {
+        for (a of G.table) if (a.length == 1) {
+            x = a[0];
+            if (suit(x) == suit(c) && rank(c) > rank(x) || suit(x) != G.trump && suit(c) == G.trump) return true;
+        }
+        return c == -1;
+    }
+    return false;
+}
+
+function play(G, h, c) {
+    var s = 'player ' + h;
+    if (c == -1) s += h == G.def ? ' takes.' : ' done.';
+    else s += ' plays ' + name(c);
+    alert(s);
+}
+
+function events(x, G, h, c) {
+    x.addEventListener('mouseover', function() { x.style.top = '0px' });
+    x.addEventListener('mouseout', function() { x.style.top = '10px' });
+    x.addEventListener('click', function() { play(G, h, c); });
 }
