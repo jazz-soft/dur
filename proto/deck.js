@@ -121,6 +121,9 @@ function State(opt) {
     this.table = [];
     this.gui = [];
 }
+State.prototype.update = function() {
+    for (var g of this.gui) g.set(this);
+}
 
 function first(X) {
     var i, j, k, n = 0, m = 99;
@@ -198,6 +201,7 @@ Gui.prototype.init = function(G) {
     this.hands.push(new GuiBackR(3, this.right));
 
     this.set(G);
+    G.gui.push(this);
 }
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
@@ -286,6 +290,7 @@ GuiHand.prototype.set = function(G) {
     var x = 0;
     var y0 = '20px';
     var y1 = '10px';
+    this.span.innerHTML = '';
     for (i = 0; i < G.hands[0].length; i++) {
         v = G.hands[0][i];
         c = card(v);
@@ -322,6 +327,7 @@ function GuiBack(n, at) {
     at.appendChild(this.span);
 }
 GuiBack.prototype.set = function(G) {
+    this.span.innerHTML = '';
     for (var i = 0; i < G.hands[this.n].length; i++) {
         this.span.appendChild(backv());
     }
@@ -336,6 +342,7 @@ function GuiBackL(n, at) {
     at.appendChild(this.span);
 }
 GuiBackL.prototype.set = function(G) {
+    this.span.innerHTML = '';
     for (var i = 0; i < G.hands[this.n].length; i++) {
         this.span.appendChild(backh());
     }
@@ -350,6 +357,7 @@ function GuiBackR(n, at) {
     at.appendChild(this.span);
 }
 GuiBackR.prototype.set = function(G) {
+    this.span.innerHTML = '';
     for (var i = 0; i < G.hands[this.n].length; i++) {
         this.span.appendChild(backh());
     }
@@ -358,6 +366,7 @@ GuiBackR.prototype.set = function(G) {
 function valid(G, h, c) {
     var a, x;
     console.log(h, c, G.att);
+    if (h != G.turn) return false;
     if (h == G.att) {
         if (!G.table.length) return c != -1;
         for (a of G.table) for (x of a) if (rank(x) == rank(c)) return true;
@@ -378,6 +387,15 @@ function play(G, h, c) {
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
     alert(s);
+    if (c != -1) G.hands[h].splice(G.hands[h].indexOf(c), 1);
+    if (h == G.def) {
+        if (c != -1) G.table[G.table.length - 1].push([c]);
+    }
+    else {
+        if (c != -1) G.table.push([c]);
+        G.turn = G.def;
+    }
+    G.update();
 }
 
 function events(x, G, h, c) {
