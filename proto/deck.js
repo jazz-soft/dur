@@ -328,8 +328,11 @@ function GuiBack(n, at) {
 }
 GuiBack.prototype.set = function(G) {
     this.span.innerHTML = '';
-    for (var i = 0; i < G.hands[this.n].length; i++) {
-        this.span.appendChild(backv());
+    var i, c;
+    for (i = 0; i < G.hands[this.n].length; i++) {
+        c = backv();
+        c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
     }
 }
 
@@ -343,8 +346,11 @@ function GuiBackL(n, at) {
 }
 GuiBackL.prototype.set = function(G) {
     this.span.innerHTML = '';
-    for (var i = 0; i < G.hands[this.n].length; i++) {
-        this.span.appendChild(backh());
+    var i, c;
+    for (i = 0; i < G.hands[this.n].length; i++) {
+        c = backh();
+        c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
     }
 }
 
@@ -358,14 +364,17 @@ function GuiBackR(n, at) {
 }
 GuiBackR.prototype.set = function(G) {
     this.span.innerHTML = '';
-    for (var i = 0; i < G.hands[this.n].length; i++) {
-        this.span.appendChild(backh());
+    var i, c;
+    for (i = 0; i < G.hands[this.n].length; i++) {
+        c = backh();
+        c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
     }
 }
 
 function valid(G, h, c) {
     var a, x;
-    console.log(h, c, G.att);
+    //console.log(h, c, G.att);
     if (h != G.turn) return false;
     if (h == G.att) {
         if (!G.table.length) return c != -1;
