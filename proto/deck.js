@@ -106,6 +106,7 @@ function State(opt) {
     }
     this.players = n;
     this.hands = [];
+    this.bots = [];
     k = 0;
     for (i = 0; i < this.players; i++) {
         this.hands[i] = this.deck.A.slice(k, k + 6);
@@ -113,8 +114,14 @@ function State(opt) {
         k += 6;
     }
     this.left = 36 - k;
+    for (i = 0; i < this.players; i++) this.bots = new Bot(this, i);
     n = opt.turn;
-    if (n != parseInt(n) || n < 0 || n >= this.players) n = first(this);
+    if (n != parseInt(n) || n < 0 || n >= this.players) {
+        n = smallest_trump(this);
+        for (i = 0; i < this.bots; i++) this.bots[i].seen(n[0], n[1]);
+        this.flash = [n[0], [n[1]]];
+        n = n[0];
+    }
     this.turn = n;
     this.att = n;
     this.def = (n + 1) % this.players;
@@ -125,18 +132,18 @@ State.prototype.update = function() {
     for (var g of this.gui) g.set(this);
 }
 
-function first(X) {
+function smallest_trump(G) {
     var i, j, k, n = 0, m = 99;
-    for (i = 0; i < X.players; i++) {
+    for (i = 0; i < G.players; i++) {
         for (j = 0; j < 6; j++) {
-            k = X.hands[i][j];
-            if (suit(k) != X.trump || k > m) continue;
+            k = G.hands[i][j];
+            if (suit(k) != G.trump || k > m) continue;
             m = k;
             n = i;
             break;
         }
     }
-    return n;
+    return [n, m];
 }
 
 function compare(a, b) { return a - b; }
