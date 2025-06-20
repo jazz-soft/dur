@@ -4,7 +4,6 @@ function Bot(G, n) {
     this.hands = [];
     for (i = 0; i < G.players; i++) this.hands[i] = [G.hands[i].length, []];
     this.hands[n][1] = G.hands[n].slice();
-    this.log();
 }
 
 Bot.prototype.log = function() {
@@ -17,4 +16,9 @@ Bot.prototype.log = function() {
         b.push(a.join(', '));
     }
     console.log(b.join(' -- '));
+}
+
+Bot.prototype.seen = function(n, c) {
+    if (this.hands[n][1].indexOf(c) == -1) this.hands[n][1].push(c);
+    this.hands[n][1].sort();
 }

@@ -114,11 +114,11 @@ function State(opt) {
         k += 6;
     }
     this.left = 36 - k;
-    for (i = 0; i < this.players; i++) this.bots = new Bot(this, i);
+    for (i = 0; i < this.players; i++) this.bots[i] = new Bot(this, i);
     n = opt.turn;
     if (n != parseInt(n) || n < 0 || n >= this.players) {
         n = smallest_trump(this);
-        for (i = 0; i < this.bots; i++) this.bots[i].seen(n[0], n[1]);
+        for (i = 0; i < this.players; i++) this.bots[i].seen(n[0], n[1]);
         this.flash = [n[0], [n[1]]];
         n = n[0];
     }
