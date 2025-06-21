@@ -106,9 +106,11 @@ function State(opt) {
     }
     this.players = n;
     this.hands = [];
+    this.flash = [];
     this.bots = [];
     k = 0;
     for (i = 0; i < this.players; i++) {
+        this.flash[i] = [];
         this.hands[i] = this.deck.A.slice(k, k + 6);
         this.hands[i].sort(compare);
         k += 6;
@@ -119,7 +121,7 @@ function State(opt) {
     if (n != parseInt(n) || n < 0 || n >= this.players) {
         n = smallest_trump(this);
         for (i = 0; i < this.players; i++) this.bots[i].seen(n[0], n[1]);
-        this.flash = [n[0], [n[1]]];
+        this.flash[n[0]].push(n[1]);
         n = n[0];
     }
     this.turn = n;
@@ -213,7 +215,19 @@ Gui.prototype.init = function(G) {
 Gui.prototype.set = function(G) {
     this.deck.set(G.left, G.deck.A[35]);
     this.table.set(G);
-    for (var h of this.hands) h.set(G);
+    var flash = false;
+    for (var i = 0; i < this.hands.length; i++) {
+        this.hands[i].set(G);
+        if (G.flash[i].length) flash = true;
+    }
+    if (flash) {
+        var self = this;
+        setTimeout(function() { self.reset(G); }, 800);
+    }
+}
+Gui.prototype.reset = function(G) {
+    for (var i = 0; i < G.hands.length; i++) G.flash[i] = [];
+    for (var i = 0; i < G.hands.length; i++) this.hands[i].set(G);
 }
 
 function GuiDeck(at) {
@@ -337,8 +351,14 @@ GuiBack.prototype.set = function(G) {
     this.span.innerHTML = '';
     var i, c;
     for (i = 0; i < G.hands[this.n].length; i++) {
+        if (G.flash[this.n].indexOf(G.hands[this.n][i]) != -1) continue;
         c = backv();
         c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
+    }
+    for (i = 0; i < G.flash[this.n].length; i++) {
+        c = card(G.flash[this.n][i]);
+        c.title = name(G.flash[this.n][i]);
         this.span.appendChild(c);
     }
 }
@@ -355,8 +375,14 @@ GuiBackL.prototype.set = function(G) {
     this.span.innerHTML = '';
     var i, c;
     for (i = 0; i < G.hands[this.n].length; i++) {
+        if (G.flash[this.n].indexOf(G.hands[this.n][i]) != -1) continue;
         c = backh();
         c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
+    }
+    for (i = 0; i < G.flash[this.n].length; i++) {
+        c = cardh(G.flash[this.n][i]);
+        c.title = name(G.flash[this.n][i]);
         this.span.appendChild(c);
     }
 }
@@ -373,8 +399,14 @@ GuiBackR.prototype.set = function(G) {
     this.span.innerHTML = '';
     var i, c;
     for (i = 0; i < G.hands[this.n].length; i++) {
+        if (G.flash[this.n].indexOf(G.hands[this.n][i]) != -1) continue;
         c = backh();
         c.title = name(G.hands[this.n][i]);
+        this.span.appendChild(c);
+    }
+    for (i = 0; i < G.flash[this.n].length; i++) {
+        c = cardh(G.flash[this.n][i]);
+        c.title = name(G.flash[this.n][i]);
         this.span.appendChild(c);
     }
 }
