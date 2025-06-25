@@ -205,9 +205,18 @@ Gui.prototype.init = function(G) {
     this.table = new GuiTable(this.centerdown);
     this.hands = [];
     this.hands.push(new GuiHand(this.bottom));
-    this.hands.push(new GuiBack(2, this.top));
-    this.hands.push(new GuiBackL(1, this.left));
-    this.hands.push(new GuiBackR(3, this.right));
+    if (G.players == 2) {
+        this.hands.push(new GuiBack(1, this.top));
+    }
+    if (G.players == 3) {
+        this.hands.push(new GuiBackL(1, this.left));
+        this.hands.push(new GuiBackR(2, this.right));
+    }
+    else if (G.players == 4) {
+        this.hands.push(new GuiBack(2, this.top));
+        this.hands.push(new GuiBackL(1, this.left));
+        this.hands.push(new GuiBackR(3, this.right));
+    }
 
     this.set(G);
     G.gui.push(this);

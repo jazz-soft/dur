@@ -8,7 +8,7 @@ body {background-color: #008000}
 </head>
 <body>
 <script>
-var G = new State();
+var G = new State({ players: window.location.search.substring(1) });
 //var G = new State({ turn: 0 });
 //console.log(G);
 for (var i = 0; i < G.players; i++) G.bots[i].log();
