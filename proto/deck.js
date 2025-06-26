@@ -217,6 +217,19 @@ Gui.prototype.init = function(G) {
         this.hands.push(new GuiBackL(1, this.left));
         this.hands.push(new GuiBackR(3, this.right));
     }
+    else if (G.players == 5) {
+        this.hands.push(new GuiBack(2, this.top));
+        this.hands.push(new GuiBack(3, this.top));
+        this.hands.push(new GuiBackL(1, this.left));
+        this.hands.push(new GuiBackR(4, this.right));
+    }
+    else if (G.players == 6) {
+        this.hands.push(new GuiBack(3, this.top));
+        this.hands.push(new GuiBackL(2, this.left));
+        this.hands.push(new GuiBackL(1, this.left));
+        this.hands.push(new GuiBackR(4, this.right));
+        this.hands.push(new GuiBackR(5, this.right));
+    }
 
     this.set(G);
     G.gui.push(this);
@@ -354,6 +367,8 @@ function GuiBack(n, at) {
     this.span = document.createElement('span');
     this.span.style.display = 'inline-block';
     this.span.style.position = 'relative';
+    this.span.style.marginLeft = '20px';
+    this.span.style.marginRight = '20px';
     at.appendChild(this.span);
 }
 GuiBack.prototype.set = function(G) {
