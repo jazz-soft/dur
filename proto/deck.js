@@ -337,6 +337,9 @@ function Arrow() {
         this.span.appendChild(x);
     }
 }
+Arrow.prototype.set = function(s) {
+    for (var k of Object.keys(arrows)) this[k].style.display = k == s ? 'inline-block' : 'none';
+}
 
 function GuiHand(at) {
     this.span = document.createElement('span');
@@ -389,6 +392,7 @@ GuiHand.prototype.set = function(G) {
     this.cards.appendChild(c);
     x += WIDTH;
     this.span.style.width = x + 'px';
+    this.arrow.set(G.att == 0 ? 'up' : G.def == 0 ? 'down' : 'none');
 }
 
 function GuiBack(n, at) {
@@ -398,22 +402,35 @@ function GuiBack(n, at) {
     this.span.style.position = 'relative';
     this.span.style.marginLeft = '20px';
     this.span.style.marginRight = '20px';
+
+    this.cards = document.createElement('div');
+    this.cards.style.height = '100px';
+    this.span.appendChild(this.cards);
+
+    this.stat = document.createElement('div');
+    this.stat.style.fontSize = '20px';
+    this.stat.style.color = '#fff';
+    this.arrow = new Arrow();
+    this.stat.appendChild(this.arrow.span);
+    this.span.appendChild(this.stat);
+
     at.appendChild(this.span);
 }
 GuiBack.prototype.set = function(G) {
-    this.span.innerHTML = '';
+    this.cards.innerHTML = '';
     var i, c;
     for (i = 0; i < G.hands[this.n].length; i++) {
         if (G.flash[this.n].indexOf(G.hands[this.n][i]) != -1) continue;
         c = backv();
         c.title = name(G.hands[this.n][i]);
-        this.span.appendChild(c);
+        this.cards.appendChild(c);
     }
     for (i = 0; i < G.flash[this.n].length; i++) {
         c = card(G.flash[this.n][i]);
         c.title = name(G.flash[this.n][i]);
-        this.span.appendChild(c);
+        this.cards.appendChild(c);
     }
+    this.arrow.set(G.att == this.n ? 'down' : G.def == this.n ? 'up' : 'none');
 }
 
 function GuiBackL(n, at) {
