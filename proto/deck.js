@@ -321,11 +321,40 @@ GuiTable.prototype.set = function(G) {
     }
 }
 
+var arrows = { left: '\u21d0', up: '\u21d1', right: '\u21d2', down: '\u21d3', none: '&nbsp;' };
+function Arrow() {
+    var k, x;
+    this.span = document.createElement('span');
+    for (k of Object.keys(arrows)) {
+        x = document.createElement('span');
+        x.style.display = 'inline-block';
+        x.style.width = '20px';
+        x.style.height = '20px';
+        x.style.fontSize = '20px';
+        x.style.color = '#fff';
+        x.innerHTML = arrows[k];
+        this[k] = x;
+        this.span.appendChild(x);
+    }
+}
+
 function GuiHand(at) {
     this.span = document.createElement('span');
     this.span.style.display = 'inline-block';
     this.span.style.position = 'relative';
-    this.span.style.height = '150px';
+
+    this.stat = document.createElement('div');
+    this.stat.style.fontSize = '20px';
+    this.stat.style.color = '#fff';
+    this.arrow = new Arrow();
+    this.stat.appendChild(this.arrow.span);
+    this.span.appendChild(this.stat);
+
+    this.cards = document.createElement('div');
+    this.cards.style.position = 'relative';
+    this.cards.style.height = '120px';
+    this.span.appendChild(this.cards);
+
     at.appendChild(this.span);
 }
 GuiHand.prototype.set = function(G) {
@@ -333,7 +362,7 @@ GuiHand.prototype.set = function(G) {
     var x = 0;
     var y0 = '20px';
     var y1 = '10px';
-    this.span.innerHTML = '';
+    this.cards.innerHTML = '';
     for (i = 0; i < G.hands[0].length; i++) {
         v = G.hands[0][i];
         c = card(v);
@@ -344,7 +373,7 @@ GuiHand.prototype.set = function(G) {
             c.style.top = '10px';
             events(c, G, 0, v);
         }
-        this.span.appendChild(c);
+        this.cards.appendChild(c);
         x += 80;
     }
     x += 20;
@@ -357,7 +386,7 @@ GuiHand.prototype.set = function(G) {
         c.style.top = '10px';
         events(c, G, 0, -1);
     }
-    this.span.appendChild(c);
+    this.cards.appendChild(c);
     x += WIDTH;
     this.span.style.width = x + 'px';
 }
