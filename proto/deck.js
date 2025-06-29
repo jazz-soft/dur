@@ -235,7 +235,7 @@ Gui.prototype.init = function(G) {
     G.gui.push(this);
 }
 Gui.prototype.set = function(G) {
-    this.deck.set(G.left, G.deck.A[35]);
+    this.deck.set(G);
     this.table.set(G);
     var flash = false;
     for (var i = 0; i < this.hands.length; i++) {
@@ -260,35 +260,45 @@ function GuiDeck(at) {
     this.span.style.height = '96px';
     at.appendChild(this.span);
 }
-GuiDeck.prototype.set = function(n, c) {
-    if (!this.gui) {
-        this.gui = true;
-        var tr = suit(c);
-        var span = card(-1);
+GuiDeck.prototype.set = function(G) {
+    var c = G.deck.A[35];
+    var p = 36 - G.left;
+    var tr = suit(c);
+    var span;
+    this.span.innerHTML = '';
+    if (p > 34) {
+        span = card(-1);
         span.style.position = 'absolute';
         span.style.top = '0';
         span.style.left = '0';
         this.span.appendChild(span);
-        var span = cardh(-1);
+    }
+    if (p > 35) {
+        span = cardh(-1);
         span.style.position = 'absolute';
         span.style.top = '13px';
         span.style.left = '30px';
         span.style.textAlign = 'center';
         span.style.lineHeight = '71px';
         span.style.fontSize = '48px';
-        span.style.color = tr % 3 ? '#fa8' : '#fff';
+        span.style.color = tr % 2 ? '#fa8' : '#fff';
         span.innerHTML = '\u2663\u2666\u2660\u2665'[tr];
         this.span.appendChild(span);
-        this.bottom = cardh(c);
-        this.bottom.style.position = 'absolute';
-        this.bottom.style.top = '13px';
-        this.bottom.style.left = '30px';
-        this.span.appendChild(this.bottom);
-        this.back = backv(0);
-        this.back.style.position = 'absolute';
-        this.back.style.top = '0';
-        this.back.style.left = '0';
-        this.span.appendChild(this.back);
+    }
+    if (p <= 35) {
+        span = cardh(c);
+        span.style.position = 'absolute';
+        span.style.top = '13px';
+        span.style.left = '30px';
+        this.span.appendChild(span);
+    }
+    if (p <= 34) {
+        span = backv(0);
+        span.style.position = 'absolute';
+        span.style.top = '0';
+        span.style.left = '0';
+        span.title = (name(G.deck.card(p)));
+        this.span.appendChild(span);
     }
 }
 
