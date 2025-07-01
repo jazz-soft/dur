@@ -14,5 +14,6 @@ var G = new State({ players: window.location.search.substring(1) });
 for (var i = 0; i < G.players; i++) G.bots[i].log();
 var gui = new Gui();
 gui.init(G);
+G.loop();
 </script>
 </body>

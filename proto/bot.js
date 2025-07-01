@@ -22,3 +22,7 @@ Bot.prototype.seen = function(n, c) {
     if (this.hands[n][1].indexOf(c) == -1) this.hands[n][1].push(c);
     this.hands[n][1].sort();
 }
+
+Bot.prototype.play = function(G) {
+    //G.hands
+}

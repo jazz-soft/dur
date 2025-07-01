@@ -133,6 +133,11 @@ function State(opt) {
 State.prototype.update = function() {
     for (var g of this.gui) g.set(this);
 }
+State.prototype.loop = function() {
+    var self = this;
+    if (!this.turn) return;
+    setTimeout(function() { self.bots[self.turn].play(); }, 1000);
+}
 
 function smallest_trump(G) {
     var i, j, k, n = 0, m = 99;
@@ -548,6 +553,7 @@ function play(G, h, c) {
         G.turn = G.def;
     }
     G.update();
+    G.loop();
 }
 
 function events(x, G, h, c) {
