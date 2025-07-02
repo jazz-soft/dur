@@ -20,9 +20,16 @@ Bot.prototype.log = function() {
 
 Bot.prototype.seen = function(n, c) {
     if (this.hands[n][1].indexOf(c) == -1) this.hands[n][1].push(c);
-    this.hands[n][1].sort();
+    this.hands[n][1].sort(Deck.compare);
 }
 
 Bot.prototype.play = function(G) {
-    //G.hands
+    play(G, this.n, this.valid(G)[0]);
+}
+
+Bot.prototype.valid = function(G) {
+    var a = [];
+    for (var c of this.hands[this.n][1]) if (valid(G, this.n, c)) a.push(c);
+    if (valid(G, this.n, -1)) a.push(-1);
+    return a;
 }

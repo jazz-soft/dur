@@ -92,6 +92,7 @@ Deck.prototype.shuffle = function() {
     }
 }
 Deck.prototype.card = function(n) { return this.A[n]; }
+Deck.compare = function(a, b) { return a - b; }
 
 function State(opt) {
     var i, n, k;
@@ -112,7 +113,7 @@ function State(opt) {
     for (i = 0; i < this.players; i++) {
         this.flash[i] = [];
         this.hands[i] = this.deck.A.slice(k, k + 6);
-        this.hands[i].sort(compare);
+        this.hands[i].sort(Deck.compare);
         k += 6;
     }
     this.left = 36 - k;
@@ -136,7 +137,7 @@ State.prototype.update = function() {
 State.prototype.loop = function() {
     var self = this;
     if (!this.turn) return;
-    setTimeout(function() { self.bots[self.turn].play(); }, 1000);
+    setTimeout(function() { self.bots[self.turn].play(self); }, 1000);
 }
 
 function smallest_trump(G) {
@@ -152,8 +153,6 @@ function smallest_trump(G) {
     }
     return [n, m];
 }
-
-function compare(a, b) { return a - b; }
 
 function Gui(at) {
     this.div = document.createElement('div');
