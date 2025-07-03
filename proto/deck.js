@@ -42,6 +42,7 @@ function cardh(n) {
 function suit(n) { return Math.floor(n / 9); }
 function rank(n) { return n % 9; }
 function name(n) { return [6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'][rank(n)] + '\u2663\u2666\u2660\u2665'[suit(n)]; }
+function weight(n, t) { return rank(n) + (suit(n) == t ? 9 : 0); }
 
 function backv(n) {
     n = n || 0;
@@ -93,6 +94,14 @@ Deck.prototype.shuffle = function() {
 }
 Deck.prototype.card = function(n) { return this.A[n]; }
 Deck.compare = function(a, b) { return a - b; }
+Deck.byrank = function(t) {
+    return [
+        function(a, b) { return weight(a, 0) - weight(b, 0); },
+        function(a, b) { return weight(a, 1) - weight(b, 1); },
+        function(a, b) { return weight(a, 2) - weight(b, 2); },
+        function(a, b) { return weight(a, 3) - weight(b, 3); }
+    ][t];
+}
 
 function State(opt) {
     var i, n, k;
@@ -540,12 +549,19 @@ function valid(G, h, c) {
 
 function play(G, h, c) {
     var s = 'player ' + h;
+    var k;
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
     alert(s);
-    if (c != -1) G.hands[h].splice(G.hands[h].indexOf(c), 1);
+    if (c != -1) {
+        G.hands[h].splice(G.hands[h].indexOf(c), 1);
+        for (k = 0; k < G.bots.length; k++) G.bots[k].gone(h, c);
+    }
     if (h == G.def) {
-        if (c != -1) G.table[G.table.length - 1].push([c]);
+        if (c != -1) {
+            G.table[G.table.length - 1].push([c]);
+            G.turn = G.att;
+        }
     }
     else {
         if (c != -1) G.table.push([c]);

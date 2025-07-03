@@ -23,6 +23,12 @@ Bot.prototype.seen = function(n, c) {
     this.hands[n][1].sort(Deck.compare);
 }
 
+Bot.prototype.gone = function(n, c) {
+    var k = this.hands[n][1].indexOf(c);
+    if (k != -1) this.hands[n][1].splice(k, 1);
+    this.hands[n][0]--;
+}
+
 Bot.prototype.play = function(G) {
     play(G, this.n, this.valid(G)[0]);
 }
@@ -30,6 +36,7 @@ Bot.prototype.play = function(G) {
 Bot.prototype.valid = function(G) {
     var a = [];
     for (var c of this.hands[this.n][1]) if (valid(G, this.n, c)) a.push(c);
+    a.sort(Deck.byrank(G.trump));
     if (valid(G, this.n, -1)) a.push(-1);
     return a;
 }
