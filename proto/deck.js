@@ -549,7 +549,7 @@ function valid(G, h, c) {
 
 function play(G, h, c) {
     var s = 'player ' + h;
-    var k;
+    var i, j, k, c;
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
     alert(s);
@@ -559,8 +559,18 @@ function play(G, h, c) {
     }
     if (h == G.def) {
         if (c != -1) {
-            G.table[G.table.length - 1].push([c]);
+            G.table[G.table.length - 1].push(c);
             G.turn = G.att;
+        }
+        else {
+            for (i = 0; i < G.table.length; i++) for (j = 0; j < G.table[i].length; j++) {
+                c = G.table[i][j];
+                G.hands[h].push(c);
+                G.flash[h].push(c);
+                for (k = 0; k < G.bots.length; k++) G.bots[k].seen(h, c);
+            }
+            G.hands[h].sort(Deck.compare);
+            G.table = [];
         }
     }
     else {
