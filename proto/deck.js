@@ -134,19 +134,41 @@ function State(opt) {
         this.flash[n[0]].push(n[1]);
         n = n[0];
     }
-    this.turn = n;
     this.att = n;
     this.def = (n + 1) % this.players;
     this.table = [];
     this.gui = [];
+    this.newround();
 }
 State.prototype.update = function() {
     for (var g of this.gui) g.set(this);
 }
 State.prototype.loop = function() {
     var self = this;
-    if (!this.turn) return;
-    setTimeout(function() { self.bots[self.turn].play(self); }, 1000);
+    if (this.state == 5) this.endround();
+    var next = G.state == 2 ? G.def : G.turn;
+    if (next) setTimeout(function() { self.bots[next].play(self); }, 1000);
+}
+State.prototype.newround = function() {
+    this.state = 1;
+    this.turn = this.att;
+    this.lim = this.hands[this.def].length;
+    if (this.lim > 6) this.lim = 6;
+    this.seq = [this.att];
+    for (var n = (this.att + 1) % this.players; n != this.att; n = (n + 1) % this.players) {
+        if (n == this.def) continue;
+        this.seq.push(n);
+    }
+}
+State.prototype.endround = function() {
+    for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
+        c = this.table[i][j];
+        this.hands[h].push(c);
+        this.flash[h].push(c);
+        for (k = 0; k < this.bots.length; k++) this.bots[k].seen(h, c);
+    }
+    this.hands[h].sort(Deck.compare);
+    this.table = [];
 }
 
 function smallest_trump(G) {
@@ -531,13 +553,13 @@ GuiBackR.prototype.set = function(G) {
 function valid(G, h, c) {
     var a, x;
     //console.log(h, c, G.att);
-    if (h != G.turn) return false;
-    if (h == G.att) {
+    if (h == G.turn) {
         if (!G.table.length) return c != -1;
         for (a of G.table) for (x of a) if (rank(x) == rank(c)) return true;
         return c == -1;
     }
     if (h == G.def) {
+        if (G.state != 2) return false;
         for (a of G.table) if (a.length == 1) {
             x = a[0];
             if (suit(x) == suit(c) && rank(c) > rank(x) || suit(x) != G.trump && suit(c) == G.trump) return true;
@@ -558,24 +580,23 @@ function play(G, h, c) {
         for (k = 0; k < G.bots.length; k++) G.bots[k].gone(h, c);
     }
     if (h == G.def) {
-        if (c != -1) {
-            G.table[G.table.length - 1].push(c);
-            G.turn = G.att;
+        if (c == -1) {
+            G.state = 4;
         }
         else {
-            for (i = 0; i < G.table.length; i++) for (j = 0; j < G.table[i].length; j++) {
-                c = G.table[i][j];
-                G.hands[h].push(c);
-                G.flash[h].push(c);
-                for (k = 0; k < G.bots.length; k++) G.bots[k].seen(h, c);
-            }
-            G.hands[h].sort(Deck.compare);
-            G.table = [];
+            G.table[G.table.length - 1].push(c);
+            //G.state = 3;
+            G.state = 5;
         }
     }
     else {
-        if (c != -1) G.table.push([c]);
-        G.turn = G.def;
+        if (c == -1) {
+
+        }
+        else {
+            G.table.push([c]);
+            if (G.state != 4) G.state = 2;
+        }
     }
     G.update();
     G.loop();
