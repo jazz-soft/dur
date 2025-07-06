@@ -104,7 +104,7 @@ Deck.byrank = function(t) {
 }
 
 function State(opt) {
-    var i, n, k;
+    var i, n;
     opt = opt || {};
     this.deck = new Deck(opt.deck);
     if (!opt.deck) this.deck.shuffle();
@@ -118,14 +118,12 @@ function State(opt) {
     this.hands = [];
     this.flash = [];
     this.bots = [];
-    k = 0;
     for (i = 0; i < this.players; i++) {
         this.flash[i] = [];
-        this.hands[i] = this.deck.A.slice(k, k + 6);
-        this.hands[i].sort(Deck.compare);
-        k += 6;
+        this.hands[i] = [];
     }
-    this.left = 36 - k;
+    this.indeck = 36;
+    this.deal(1);
     for (i = 0; i < this.players; i++) this.bots[i] = new Bot(this, i);
     n = opt.turn;
     if (n != parseInt(n) || n < 0 || n >= this.players) {
@@ -145,9 +143,29 @@ State.prototype.update = function() {
 }
 State.prototype.loop = function() {
     var self = this;
-    if (this.state == 5) this.endround();
-    var next = G.state == 2 ? G.def : G.turn;
+    if (this.state == 5) {
+        setTimeout(function() { self.endround(); }, 1000);
+        return;
+    }
+    var next = this.state == 2 ? this.def : this.turn;
     if (next) setTimeout(function() { self.bots[next].play(self); }, 1000);
+    this.update();
+}
+State.prototype.deal = function(n) {
+    var i, k, p;
+    p = 36 - this.indeck;
+    for (i = 0; i < this.players; i++) {
+        if (!this.indeck) return;
+        k = 6 - this.hands[n].length;
+        if (k > this.indeck) k = this.indeck;
+        if (k > 0) {
+            this.hands[n] = this.hands[n].concat(this.deck.A.slice(p, p + k));
+            this.hands[n].sort(Deck.compare);
+            this.indeck -= k;
+            p += k;
+        }
+        n = (n + 1) % this.players;
+    }
 }
 State.prototype.newround = function() {
     this.state = 1;
@@ -157,18 +175,40 @@ State.prototype.newround = function() {
     this.seq = [this.att];
     for (var n = (this.att + 1) % this.players; n != this.att; n = (n + 1) % this.players) {
         if (n == this.def) continue;
+        // todo: 2x2
         this.seq.push(n);
     }
+    this.vist = 0;
 }
 State.prototype.endround = function() {
+    var i, j, k;
+    // for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
+    //     c = this.table[i][j];
+    //     this.hands[h].push(c);
+    //     this.flash[h].push(c);
+    //     for (k = 0; k < this.bots.length; k++) this.bots[k].seen(h, c);
+    // }
+    // this.hands[h].sort(Deck.compare);
     for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
         c = this.table[i][j];
-        this.hands[h].push(c);
-        this.flash[h].push(c);
-        for (k = 0; k < this.bots.length; k++) this.bots[k].seen(h, c);
+        for (k = 0; k < this.bots.length; k++) this.bots[k].trash(c);
     }
-    this.hands[h].sort(Deck.compare);
+    for (k = this.def; !this.hands[k].length; k = (k + 1) % this.players) {
+        // todo: 2x2
+    }
+    this.deal(this.att);
+    this.att = k;
+    this.def = this.next(k);
     this.table = [];
+    this.update();
+    this.newround();
+    this.loop();
+}
+State.prototype.next = function(k) {
+    for (k = (k + 1) % this.players; !this.hands[k].length; k = (k + 1) % this.players) {
+        // todo: 2x2
+    }
+    return k;
 }
 
 function smallest_trump(G) {
@@ -297,7 +337,7 @@ function GuiDeck(at) {
 }
 GuiDeck.prototype.set = function(G) {
     var c = G.deck.A[35];
-    var p = 36 - G.left;
+    var p = 36 - G.indeck;
     var tr = suit(c);
     var span;
     this.span.innerHTML = '';
@@ -550,10 +590,10 @@ GuiBackR.prototype.set = function(G) {
     this.arrow.set(G.att == this.n ? 'left' : G.def == this.n ? 'right' : 'none');
 }
 
+var canplay = { 1: true, 3: true, 4: true };
 function valid(G, h, c) {
     var a, x;
-    //console.log(h, c, G.att);
-    if (h == G.turn) {
+    if (h == G.turn && canplay[G.state]) {
         if (!G.table.length) return c != -1;
         for (a of G.table) for (x of a) if (rank(x) == rank(c)) return true;
         return c == -1;
@@ -591,9 +631,13 @@ function play(G, h, c) {
     }
     else {
         if (c == -1) {
-
+            G.pass[h] = true;
+            G.vist = (G.vist + 1) % G.seq.length;
+            G.turn = G.seq[G.vist];
+            if (G.pass[G.turn]) G.state = 5;
         }
         else {
+            G.pass = {};
             G.table.push([c]);
             if (G.state != 4) G.state = 2;
         }

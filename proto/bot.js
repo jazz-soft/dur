@@ -4,6 +4,7 @@ function Bot(G, n) {
     this.hands = [];
     for (i = 0; i < G.players; i++) this.hands[i] = [G.hands[i].length, []];
     this.hands[n][1] = G.hands[n].slice();
+    this.bito = [];
 }
 
 Bot.prototype.log = function() {
@@ -15,6 +16,9 @@ Bot.prototype.log = function() {
         for (; k < this.hands[i][0]; k++) a.push('?');
         b.push(a.join(', '));
     }
+    a = [];
+    for (k = 0; k < this.bito.length; k++) a.push(name(this.bito[k]));
+    b.push(a.join(', '));
     console.log(b.join(' -- '));
 }
 
@@ -27,6 +31,11 @@ Bot.prototype.gone = function(n, c) {
     var k = this.hands[n][1].indexOf(c);
     if (k != -1) this.hands[n][1].splice(k, 1);
     this.hands[n][0]--;
+}
+
+Bot.prototype.trash = function(c) {
+    if (this.bito.indexOf(c) == -1) this.bito.push(c);
+    this.bito.sort(Deck.compare);
 }
 
 Bot.prototype.play = function(G) {
