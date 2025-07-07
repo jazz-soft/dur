@@ -1,9 +1,8 @@
-function Bot(G, n) {
+function Bot(m, n) {
     var i;
     this.n = n;
     this.hands = [];
-    for (i = 0; i < G.players; i++) this.hands[i] = [G.hands[i].length, []];
-    this.hands[n][1] = G.hands[n].slice();
+    for (i = 0; i < m; i++) this.hands[i] = [0, []];
     this.bito = [];
 }
 
@@ -27,7 +26,15 @@ Bot.prototype.seen = function(n, c) {
     this.hands[n][1].sort(Deck.compare);
 }
 
-Bot.prototype.gone = function(n, c) {
+Bot.prototype.add = function(n, c) {
+    if (n == this.n) {
+        this.hands[n][1].push(c);
+        this.hands[n][1].sort(Deck.compare);
+    }
+    this.hands[n][0]++;
+}
+
+Bot.prototype.remove = function(n, c) {
     var k = this.hands[n][1].indexOf(c);
     if (k != -1) this.hands[n][1].splice(k, 1);
     this.hands[n][0]--;

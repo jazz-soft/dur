@@ -46,8 +46,8 @@ function State(opt) {
         this.hands[i] = [];
     }
     this.indeck = 36;
+    for (i = 0; i < this.players; i++) this.bots[i] = new Bot(this.players, i);
     this.deal(1);
-    for (i = 0; i < this.players; i++) this.bots[i] = new Bot(this, i);
     n = opt.turn;
     if (n != parseInt(n) || n < 0 || n >= this.players) {
         n = smallest_trump(this);
@@ -79,15 +79,17 @@ State.prototype.loop = function() {
     this.update();
 }
 State.prototype.deal = function(n) {
-    var i, k, p;
+    var i, k, m, p, a, b;
     p = 36 - this.indeck;
     for (i = 0; i < this.players; i++) {
         if (!this.indeck) return;
         k = 6 - this.hands[n].length;
         if (k > this.indeck) k = this.indeck;
         if (k > 0) {
-            this.hands[n] = this.hands[n].concat(this.deck.A.slice(p, p + k));
+            a = this.deck.A.slice(p, p + k);
+            this.hands[n] = this.hands[n].concat(a);
             this.hands[n].sort(Deck.compare);
+            for (b of this.bots) for (m = 0; m < k; m++) b.add(n, a[m]);
             this.indeck -= k;
             p += k;
         }
@@ -130,7 +132,10 @@ State.prototype.takeall = function() {
         c = this.table[i][j];
         this.hands[this.def].push(c);
         this.flash[this.def].push(c);
-        for (k = 0; k < this.bots.length; k++) this.bots[k].seen(this.def, c);
+        for (k = 0; k < this.bots.length; k++) {
+            this.bots[k].add(this.def, c);
+            this.bots[k].seen(this.def, c);
+        }
     }
     this.hands[this.def].sort(Deck.compare);
 
@@ -192,7 +197,7 @@ function play(G, h, c) {
     alert(s);
     if (c != -1) {
         G.hands[h].splice(G.hands[h].indexOf(c), 1);
-        for (k = 0; k < G.bots.length; k++) G.bots[k].gone(h, c);
+        for (k = 0; k < G.bots.length; k++) G.bots[k].remove(h, c);
     }
     if (h == G.def) {
         if (c == -1) {
