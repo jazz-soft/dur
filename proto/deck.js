@@ -147,6 +147,10 @@ State.prototype.loop = function() {
         setTimeout(function() { self.endround(); }, 1000);
         return;
     }
+    if (this.state == 6) {
+        setTimeout(function() { self.takeall(); }, 1000);
+        return;
+    }
     var next = this.state == 2 ? this.def : this.turn;
     if (next) setTimeout(function() { self.bots[next].play(self); }, 1000);
     this.update();
@@ -181,14 +185,7 @@ State.prototype.newround = function() {
     this.vist = 0;
 }
 State.prototype.endround = function() {
-    var i, j, k;
-    // for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
-    //     c = this.table[i][j];
-    //     this.hands[h].push(c);
-    //     this.flash[h].push(c);
-    //     for (k = 0; k < this.bots.length; k++) this.bots[k].seen(h, c);
-    // }
-    // this.hands[h].sort(Deck.compare);
+    var c, i, j, k;
     for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
         c = this.table[i][j];
         for (k = 0; k < this.bots.length; k++) this.bots[k].trash(c);
@@ -199,6 +196,24 @@ State.prototype.endround = function() {
     this.deal(this.att);
     this.att = k;
     this.def = this.next(k);
+    this.table = [];
+    this.update();
+    this.newround();
+    this.loop();
+}
+State.prototype.takeall = function() {
+    var c, i, j, k;
+    for (i = 0; i < this.table.length; i++) for (j = 0; j < this.table[i].length; j++) {
+        c = this.table[i][j];
+        this.hands[this.def].push(c);
+        this.flash[this.def].push(c);
+        for (k = 0; k < this.bots.length; k++) this.bots[k].seen(this.def, c);
+    }
+    this.hands[this.def].sort(Deck.compare);
+
+    this.deal(this.att);
+    this.att = this.next(this.def);
+    this.def = this.next(this.att);
     this.table = [];
     this.update();
     this.newround();
@@ -614,6 +629,8 @@ function play(G, h, c) {
     var i, j, k, c;
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
+    G.bots[h].log();
+    console.log(s);
     alert(s);
     if (c != -1) {
         G.hands[h].splice(G.hands[h].indexOf(c), 1);
@@ -621,12 +638,11 @@ function play(G, h, c) {
     }
     if (h == G.def) {
         if (c == -1) {
-            G.state = 4;
+            G.state = G.lim > G.table.length ? 4 : 6;
         }
         else {
             G.table[G.table.length - 1].push(c);
-            //G.state = 3;
-            G.state = 5;
+            G.state = G.lim > G.table.length ? 3 : 5;
         }
     }
     else {
@@ -634,12 +650,12 @@ function play(G, h, c) {
             G.pass[h] = true;
             G.vist = (G.vist + 1) % G.seq.length;
             G.turn = G.seq[G.vist];
-            if (G.pass[G.turn]) G.state = 5;
+            if (G.pass[G.turn]) G.state = G.state == 4 ? 6 : 5;
         }
         else {
             G.pass = {};
             G.table.push([c]);
-            if (G.state != 4) G.state = 2;
+            G.state = G.state == 4 ? G.lim > G.table.length ? 4 : 6 : 2;
         }
     }
     G.update();
