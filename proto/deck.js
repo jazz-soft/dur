@@ -66,6 +66,12 @@ State.prototype.update = function() {
 }
 State.prototype.loop = function() {
     var self = this;
+    if (G.ended()) {
+        G.state = 0;
+        for (var k = 0; k < G.hands.length; k++) if (G.hands[k].length) break;
+        setTimeout(function() { alert('player ' + k + ' lost!'); }, 0);
+        return;
+    }
     if (this.state == 5) {
         setTimeout(function() { self.endround(); }, 1000);
         return;
@@ -153,6 +159,15 @@ State.prototype.next = function(k) {
     }
     return k;
 }
+State.prototype.ended = function() {
+    if (this.indeck) return false;
+    var n = 0;
+    for (var x of this.hands) {
+        if (x.length) n++;
+        if (n > 1) return false;
+    }
+    return true;
+}
 
 function smallest_trump(G) {
     var i, j, k, n = 0, m = 99;
@@ -189,10 +204,10 @@ function valid(G, h, c) {
 
 function play(G, h, c) {
     var s = 'player ' + h;
-    var i, j, k, c;
+    var k, c;
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
-    G.bots[h].log();
+    for (k = 0; k < G.bots.length; k++) G.bots[k].log();
     console.log(s);
     alert(s);
     if (c != -1) {
