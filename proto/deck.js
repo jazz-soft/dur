@@ -66,10 +66,10 @@ State.prototype.update = function() {
 }
 State.prototype.loop = function() {
     var self = this;
-    if (G.ended()) {
-        G.state = 0;
+    if (this.ended()) {
+        this.state = 0;
         for (var k = 0; k < G.hands.length; k++) if (G.hands[k].length) break;
-        setTimeout(function() { alert('player ' + k + ' lost!'); }, 0);
+        setTimeout(function() { alert('player ' + k + ' lost!'); }, 1000);
         return;
     }
     if (this.state == 5) {
@@ -226,7 +226,10 @@ function play(G, h, c) {
     else {
         if (c == -1) {
             G.pass[h] = true;
-            G.vist = (G.vist + 1) % G.seq.length;
+            for (G.vist = (G.vist + 1) % G.seq.length; G.seq[G.vist] != h; G.vist = (G.vist + 1) % G.seq.length) {
+                if (G.hands[G.seq[G.vist]].length) break;
+                G.pass[G.seq[G.vist]] = true;
+            }
             G.turn = G.seq[G.vist];
             if (G.pass[G.turn]) G.state = G.state == 4 ? 6 : 5;
         }
