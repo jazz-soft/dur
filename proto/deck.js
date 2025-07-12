@@ -68,7 +68,9 @@ State.prototype.loop = function() {
     var self = this;
     if (this.ended()) {
         this.state = 0;
-        for (var k = 0; k < G.hands.length; k++) if (G.hands[k].length) break;
+        this.att = -1;
+        this.def = -1;
+        for (var k = 0; k < this.hands.length; k++) if (this.hands[k].length) break;
         setTimeout(function() { alert('player ' + k + ' lost!'); }, 1000);
         return;
     }
