@@ -72,18 +72,17 @@ State.prototype.loop = function() {
         this.def = -1;
         for (var k = 0; k < this.hands.length; k++) if (this.hands[k].length) break;
         setTimeout(function() { alert('player ' + k + ' lost!'); }, 1000);
-        return;
     }
-    if (this.state == 5) {
+    else if (this.state == 5) {
         setTimeout(function() { self.endround(); }, 1000);
-        return;
     }
-    if (this.state == 6) {
+    else if (this.state == 6) {
         setTimeout(function() { self.takeall(); }, 1000);
-        return;
     }
-    var next = this.state == 2 ? this.def : this.turn;
-    if (next) setTimeout(function() { self.bots[next].play(self); }, 1000);
+    else {
+        var next = this.state == 2 ? this.def : this.turn;
+        if (next) setTimeout(function() { self.bots[next].play(self); }, 1000);
+    }
     this.update();
 }
 State.prototype.deal = function(n) {
@@ -161,6 +160,10 @@ State.prototype.next = function(k) {
     }
     return k;
 }
+State.prototype.done = function() {
+    if (this.lim >= this.table.length) return true;
+    return false;
+}
 State.prototype.ended = function() {
     if (this.indeck) return false;
     var n = 0;
@@ -218,11 +221,11 @@ function play(G, h, c) {
     }
     if (h == G.def) {
         if (c == -1) {
-            G.state = G.lim > G.table.length ? 4 : 6;
+            G.state = G.done() ? 6 : 4;
         }
         else {
             G.table[G.table.length - 1].push(c);
-            G.state = G.lim > G.table.length ? 3 : 5;
+            G.state = G.done() ? 5 : 3;
         }
     }
     else {
