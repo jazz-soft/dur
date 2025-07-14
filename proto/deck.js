@@ -122,10 +122,10 @@ State.prototype.endround = function() {
         c = this.table[i][j];
         for (k = 0; k < this.bots.length; k++) this.bots[k].trash(c);
     }
+    this.deal(this.att);
     for (k = this.def; !this.hands[k].length; k = (k + 1) % this.players) {
         // todo: 2x2
     }
-    this.deal(this.att);
     this.att = k;
     this.def = this.next(k);
     this.table = [];
@@ -161,8 +161,16 @@ State.prototype.next = function(k) {
     return k;
 }
 State.prototype.done = function() {
-    if (this.lim >= this.table.length) return true;
-    return false;
+    var i, k;
+    if (this.lim <= this.table.length) return true;
+    for (i = 0; i < this.seq.length; i++) {
+        k = this.seq[this.vist];
+        if (this.hands[k].length && !this.pass[k]) break;
+        this.pass[k] = true;
+        this.vist = (this.vist + 1) % this.seq.length;
+    }
+    this.turn = k;
+    return !!this.pass[k];
 }
 State.prototype.ended = function() {
     if (this.indeck) return false;
@@ -231,17 +239,15 @@ function play(G, h, c) {
     else {
         if (c == -1) {
             G.pass[h] = true;
-            for (G.vist = (G.vist + 1) % G.seq.length; G.seq[G.vist] != h; G.vist = (G.vist + 1) % G.seq.length) {
-                if (G.hands[G.seq[G.vist]].length) break;
-                G.pass[G.seq[G.vist]] = true;
-            }
+            G.vist = (G.vist + 1) % G.seq.length;
             G.turn = G.seq[G.vist];
-            if (G.pass[G.turn]) G.state = G.state == 4 ? 6 : 5;
+            if (G.done()) G.state = G.state == 4 ? 6 : 5;
         }
         else {
             G.pass = {};
             G.table.push([c]);
-            G.state = G.state == 4 ? G.lim > G.table.length ? 4 : 6 : 2;
+            if (G.done()) G.state = G.state == 4 ? 6 : 2;
+            else G.state = G.state == 4 ? 4 : 2;
         }
     }
     G.update();
