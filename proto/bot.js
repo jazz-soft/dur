@@ -45,7 +45,29 @@ Bot.prototype.trash = function(c) {
     this.bito.sort(Deck.compare);
 }
 
+Bot.prototype.deduce = function(G) {
+    if (G.indeck > 1) return;
+    var k, h, x;
+    k = 0;
+    for (x of this.hands) {
+        if (x[0] == x[1].length) continue;
+        k++;
+        h = x;
+    }
+    if (k != 1) return;
+    var a = {};
+    if (G.indeck == 1) a[G.G.deck.A[35]] = true;
+    for (k in this.bito) a[k] = true;
+    for (x of this.hands) {
+        if (x == h) continue;
+        for (k of x[1]) a[k] = true;
+    }
+    h[1] = [];
+    for (k = 0; k < 36; k++) if (!a[k]) h[1].push(k);
+}
+
 Bot.prototype.play = function(G) {
+    this.deduce(G);
     play(G, this.n, this.valid(G)[0]);
 }
 
