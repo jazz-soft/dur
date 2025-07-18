@@ -12,7 +12,7 @@ body {background-color: #008000}
 var G = new State({ players: window.location.search.substring(1) });
 //var G = new State({ turn: 0 });
 //console.log(G);
-for (var i = 0; i < G.players; i++) G.bots[i].log();
+//for (var i = 0; i < G.players; i++) G.bots[i].log();
 var gui = new Gui();
 gui.init(G);
 G.loop();

@@ -220,8 +220,6 @@ function play(G, h, c) {
     var k, c;
     if (c == -1) s += h == G.def ? ' takes.' : ' done.';
     else s += ' plays ' + name(c);
-    for (k = 0; k < G.bots.length; k++) G.bots[k].log();
-    console.log(s);
     alert(s);
     if (c != -1) {
         G.hands[h].splice(G.hands[h].indexOf(c), 1);
