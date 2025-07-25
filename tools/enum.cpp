@@ -83,4 +83,5 @@ int main(int argc, char* argv[]) {
     cout << "; Tr: " << Suit[tr] << endl;
     State X(H1, H2, tr);
     cout << X << endl;
+    cout << X.flip() << endl;
 }

@@ -61,6 +61,7 @@ public:
     }
     template<typename T> Hand& operator+=(T x) { return *this + x; }
     template<typename T> Hand& operator-=(T x) { return *this - x; }
+    operator bool() const { return H; }
     friend std::ostream& operator<<(std::ostream& os, const Hand& H) {
         bool first = true;
         int64_t t = 1;
