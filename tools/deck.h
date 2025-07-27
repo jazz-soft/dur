@@ -45,8 +45,8 @@ private:
 };
 
 class Hand {
-    static const unsigned char SZ = 36;
 public:
+    static const unsigned char SZ = 36;
     Hand() : H(0) {}
     Hand(int64_t h) : H(h) {}
     Hand(const Hand& h) : H(h.H) {}
@@ -61,6 +61,15 @@ public:
     }
     template<typename T> Hand& operator+=(T x) { return *this + x; }
     template<typename T> Hand& operator-=(T x) { return *this - x; }
+    char count() {
+        char n = 0;
+        int64_t t = 1;
+        for (auto i = 0; i < SZ; i++) {
+            if (H & t) n++;
+            t <<= 1;
+        }
+        return n;
+    }
     operator bool() const { return H; }
     friend std::ostream& operator<<(std::ostream& os, const Hand& H) {
         bool first = true;
