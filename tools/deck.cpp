@@ -9,3 +9,12 @@ void Deck::shuffle() {
     static std::random_device rd;
     std::shuffle(A.begin(), A.end(), rd);
 }
+
+Hand::operator Card() const {
+    int64_t t = 1;
+    for (auto i = 0; i < SZ; i++) {
+        if (H & t) return Card(i);
+        t <<= 1;
+    }
+    throw "Empty hand";
+}

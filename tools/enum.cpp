@@ -76,12 +76,7 @@ int main(int argc, char* argv[]) {
     }
     for (auto it = M1.begin(); it != M1.end(); it++) if (it->second) H1.push_back(it->first);
     for (auto it = M2.begin(); it != M2.end(); it++) if (it->second) H2.push_back(it->first);
-    cout << "1:";
-    for (auto x : H1) cout << " " << Card(x);
-    cout << "; 2:";
-    for (auto x : H2) cout << " " << Card(x);
-    cout << "; Tr: " << Suit[tr] << endl;
     State X(H1, H2, tr);
     cout << X << endl;
-    cout << X.flip() << endl;
+    //cout << X.flip() << endl;
 }

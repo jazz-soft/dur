@@ -13,6 +13,7 @@ public:
         H6, H7, H8, H9, H10, HJ, HQ, HK, HA
     };
     Card(unsigned char v) : V(v) {};
+    Card(const Card& c) : V(c.V) {};
     unsigned char suit() const { return V / 9; }
     unsigned char rank() const { return V % 9; }
     template<typename T> operator T() const { return V; }
@@ -71,6 +72,7 @@ public:
         return n;
     }
     operator bool() const { return H; }
+    operator Card() const;
     friend std::ostream& operator<<(std::ostream& os, const Hand& H) {
         bool first = true;
         int64_t t = 1;
