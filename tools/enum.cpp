@@ -38,6 +38,14 @@ void usage(const string& s) {
     cout << "  <trump> - trump suit, one of S/H/D/C\n";
 }
 
+template<typename T> void print_moves(std::ostream& os, T a) {
+    for (auto i = 0; i < a.size(); i++) {
+        os << " ";
+        if (a[i] != -1) os << Card(a[i]);
+        else os << "##";
+    }
+}
+
 int main(int argc, char* argv[]) {
     map<unsigned char, bool> M1, M2;
     vector<unsigned char> H1, H2;
@@ -78,5 +86,6 @@ int main(int argc, char* argv[]) {
     for (auto it = M2.begin(); it != M2.end(); it++) if (it->second) H2.push_back(it->first);
     State X(H1, H2, tr);
     cout << X << endl;
-    //cout << X.flip() << endl;
+    cout << "Valid moves:";
+    print_moves(cout, X.valid());
 }

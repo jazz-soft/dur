@@ -52,6 +52,8 @@ public:
     Hand(int64_t h) : H(h) {}
     Hand(const Hand& h) : H(h.H) {}
     template<typename T> Hand(T a) : H(0) { for (auto x : a) H |= (int64_t(1) << x); }
+    template<typename T> T operator&(T x) const { return H & x; }
+    template<typename T> T operator|(T x) const { return H | x; }
     template<typename T> Hand& operator+(T x) {
         H |= int64_t(1) << x;
         return *this;
