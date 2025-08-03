@@ -2,8 +2,11 @@
 
 using namespace std;
 
+static std::string StName[] = { "START", "DEFEND", "CONTINUE", "ADD" };
+
 std::ostream& operator<<(std::ostream& os, const State& X) {
     os << "1: " << X.A << ", 2: " << X.B << ", tr: " << Card::suits[X.Tr];
+    os << ", State: " << StName[X.St];
     if (X.T) os << ", T: " << X.T;
     if (X.M) os << " * " << X.M;
     return os;
