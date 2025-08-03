@@ -62,8 +62,11 @@ public:
         H &= ~(int64_t(1) << x);
         return *this;
     }
+    void clear() { H = 0; }
     template<typename T> Hand& operator+=(T x) { return *this + x; }
     template<typename T> Hand& operator-=(T x) { return *this - x; }
+    Hand& operator+=(const Hand& X) { H |= X.H; return *this; }
+    Hand& operator-=(const Hand& X) { H &= ~X.H; return *this; }
     char count() {
         char n = 0;
         int64_t t = 1;
@@ -74,6 +77,7 @@ public:
         return n;
     }
     operator bool() const { return H; }
+    operator int64_t() const { return H; }
     operator Card() const;
     friend std::ostream& operator<<(std::ostream& os, const Hand& H) {
         bool first = true;

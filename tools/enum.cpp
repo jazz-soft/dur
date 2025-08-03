@@ -38,12 +38,19 @@ void usage(const string& s) {
     cout << "  <trump> - trump suit, one of S/H/D/C\n";
 }
 
-template<typename T> void print_moves(std::ostream& os, T a) {
-    for (auto i = 0; i < a.size(); i++) {
-        os << " ";
-        if (a[i] != -1) os << Card(a[i]);
-        else os << "##";
-    }
+std::string card(char c) {
+    if (c < 0 || c >= Hand::SZ) return "##";
+    Card C(c);
+    return std::string(Card::ranks[C.rank()]) + Card::suits[C.suit()];
+}
+void print(const State& X, int off = 0) {
+    for (auto i = 0; i < off; i++) cout << ' ';
+    cout << X << endl;
+    for (auto i = 0; i < off; i++) cout << ' ';
+    auto V = X.valid();
+    cout << "Valid moves:";
+    for (auto i = 0; i < V.size(); i++) cout << " " << card(V[i]);
+    cout << endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -85,7 +92,23 @@ int main(int argc, char* argv[]) {
     for (auto it = M1.begin(); it != M1.end(); it++) if (it->second) H1.push_back(it->first);
     for (auto it = M2.begin(); it != M2.end(); it++) if (it->second) H2.push_back(it->first);
     State X(H1, H2, tr);
-    cout << X << endl;
-    cout << "Valid moves:";
-    print_moves(cout, X.valid());
+    print(X);
+    auto V = X.valid();
+    for (auto m : V) {
+        cout << '(' << card(m) << ')' << endl;
+        auto Y = X.move(m);
+        print(Y, 4);
+        auto VV = Y.valid();
+        for (auto mm : VV) {
+            cout << "    (" << card(mm) << ')' << endl;
+            auto Z = Y.move(mm);
+            print(Z, 8);
+            auto VVV = Z.valid();
+            for (auto mmm : VVV) {
+                cout << "        (" << card(mmm) << ')' << endl;
+                auto W = Z.move(mmm);
+                print(W, 12);
+            }
+        }
+    }
 }

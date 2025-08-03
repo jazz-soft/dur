@@ -13,7 +13,8 @@ public:
     State(const State& X) : A(X.A), B(X.B), T(X.T), M(X.M), Tr(X.Tr), St(X.St), Lm(X.Lm) {}
     template<typename T1, typename T2, typename T3> State(T1 a, T2 b, T3 t) : A(a), B(b), Tr(t), St(0), Lm(0) {}
     State& flip() { std::swap(A, B); return *this; }
-    std::vector<char> valid();
+    State move(char);
+    std::vector<char> valid() const;
     friend std::ostream& operator<<(std::ostream& os, const State& X);
 private:
     Hand A, B, T, M;
